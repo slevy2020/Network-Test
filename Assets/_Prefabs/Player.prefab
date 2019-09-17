@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 1376401154045977741}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -141,3 +141,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4680646aff66a41088f912543979855e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  speed: 6
+  gravity: -9.8
+  cc: {fileID: 4931211176466092856}
