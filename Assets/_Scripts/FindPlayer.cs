@@ -18,10 +18,10 @@ public class FindPlayer : NetworkBehaviour {
     }
   }
 
-  public void Find() {
+  public void Find(GameObject playerObject) {
     if (!playerFound) {
-      camera.Follow = GameObject.FindGameObjectWithTag("Player").transform;
-      camera.LookAt = GameObject.FindGameObjectWithTag("Player").transform;
+      camera.Follow = playerObject.transform;
+      camera.LookAt = playerObject.transform;
       playerFound = true;
     }
   }

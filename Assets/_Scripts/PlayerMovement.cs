@@ -13,10 +13,10 @@ public class PlayerMovement : NetworkBehaviour {
   public CharacterController cc;
 
   void Start() {
-    // if (!isLocalPlayer) {
-    //   return;
-    // }
-    GameObject.FindGameObjectWithTag("Camera").GetComponent<FindPlayer>().SendMessage("Find");
+    if (!isLocalPlayer) {
+      return;
+    }
+    GameObject.FindGameObjectWithTag("Camera").GetComponent<FindPlayer>().SendMessage("Find", this.gameObject);
 
     Color random = new Color (Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
     GetComponent<Renderer>().material.color = random;
