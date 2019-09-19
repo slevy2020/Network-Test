@@ -144,7 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  speed: 60
+  speed: 6
   gravity: -9.8
   jumpSpeed: 15
   terminalVelocity: -20

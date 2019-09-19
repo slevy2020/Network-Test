@@ -45,8 +45,8 @@ public class PlayerMovement : NetworkBehaviour {
     Vector3 movement = new Vector3(deltaX, 0, deltaZ);
     movement = Vector3.ClampMagnitude(movement, speed);
 
-    movement.y = gravity;
-    movement *= Time.deltaTime;
+    //movement.y = gravity;
+    //movement *= Time.deltaTime;
     movement = transform.TransformDirection(movement);
 
     Vector2 inputDir = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
