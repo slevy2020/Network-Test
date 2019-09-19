@@ -16,9 +16,14 @@ public class PlayerMovement : NetworkBehaviour {
   private float turnSmoothVelocity;
   public float turnSmoothTime = 3.0f;
 
-  [SyncVar(hook = nameof(ChangeColor))] public Color random;
+  [SyncVar(hook = nameof(ChangeColor))] public Color random = Color.black;
 
   public CharacterController cc;
+
+  public override void OnStartServer() {
+    base.OnStartServer();
+    random = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
+  }
 
   void Start() {
     if (!isLocalPlayer) {
@@ -28,7 +33,6 @@ public class PlayerMovement : NetworkBehaviour {
     vertSpeed = minFall;
 
     GameObject.FindGameObjectWithTag("Camera").GetComponent<FindPlayer>().SendMessage("Find", this.gameObject);
-    random = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
   }
 
   void ChangeColor(Color col) {

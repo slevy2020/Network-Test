@@ -150,7 +150,7 @@ MonoBehaviour:
   terminalVelocity: -20
   minFall: -1.5
   pushForce: 3
-  turnSmoothTime: 3
+  turnSmoothTime: 0.5
   random: {r: 0, g: 0, b: 0, a: 0}
   cc: {fileID: 4931211176466092856}
 --- !u!114 &703413733869372978
