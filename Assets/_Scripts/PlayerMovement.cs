@@ -17,6 +17,8 @@ public class PlayerMovement : NetworkBehaviour {
   private float turnSmoothVelocity;
   public float turnSmoothTime = 3.0f;
 
+  private Animator animator;
+
   [SyncVar(hook = nameof(ChangeColor))] public Color random = Color.black;
 
   public CharacterController cc;
@@ -34,6 +36,7 @@ public class PlayerMovement : NetworkBehaviour {
     vertSpeed = minFall;
 
     GameObject.FindGameObjectWithTag("Camera").GetComponent<FindPlayer>().SendMessage("Find", this.gameObject);
+    animator = GetComponent<Animator>();
   }
 
   void ChangeColor(Color col) {
@@ -66,21 +69,23 @@ public class PlayerMovement : NetworkBehaviour {
       hitGround = hit.distance <= check;	// to be sure check slightly beyond bottom of capsule
     }
 
+    animator.SetFloat("Speed", movement.sqrMagnitude);
+
     if (hitGround) {
 			if (Input.GetButtonDown("Jump")) {
 				vertSpeed = jumpSpeed;
 			} else {
 				vertSpeed = minFall;
-				// _animator.SetBool("Jumping", false);
+				animator.SetBool("Jumping", false);
 			}
 		} else {
 			vertSpeed += gravity * 5 * Time.deltaTime;
 			if (vertSpeed < terminalVelocity) {
 				vertSpeed = terminalVelocity;
 			}
-			   // if (contact != null ) {	// not right at level start
-		     // 	_animator.SetBool("Jumping", true);
-		     // }
+  	  if (contact != null ) {	// not right at level start
+     	  animator.SetBool("Jumping", true);
+      }
 		// 	if (cc.isGrounded) {
 		// 		if (Vector3.Dot(movement, contact.normal) < 0) {
 		// 			movement = contact.normal * speed;
