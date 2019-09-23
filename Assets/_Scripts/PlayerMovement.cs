@@ -48,16 +48,12 @@ public class PlayerMovement : NetworkBehaviour {
       return;
     }
 
-    float deltaX = Input.GetAxis("Horizontal")*speed;
-    float deltaZ = Input.GetAxis("Vertical")*speed;
+    float deltaX = Input.GetAxisRaw("Horizontal")*speed;
+    float deltaZ = Input.GetAxisRaw("Vertical")*speed;
     Vector3 movement = new Vector3(deltaX, 0, deltaZ);
     movement = Vector3.ClampMagnitude(movement, speed);
 
-    //movement.y = gravity;
-    //movement *= Time.deltaTime;
-    movement = transform.TransformDirection(movement);
-
-    Vector2 inputDir = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+    Vector2 inputDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
     inputDir = inputDir.normalized;
     float targetRot = Mathf.Atan2(inputDir.x, inputDir.y)*Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y;
     transform.eulerAngles = Vector3.up*Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRot, ref turnSmoothVelocity, turnSmoothTime);
@@ -86,13 +82,13 @@ public class PlayerMovement : NetworkBehaviour {
   	  if (contact != null ) {	// not right at level start
      	  animator.SetBool("Jumping", true);
       }
-		// 	if (cc.isGrounded) {
-		// 		if (Vector3.Dot(movement, contact.normal) < 0) {
-		// 			movement = contact.normal * speed;
-		// 		} else {
-		// 			movement += contact.normal * speed;
-		// 		}
-		// }
+			if (cc.isGrounded) {
+				if (Vector3.Dot(movement, contact.normal) < 0) {
+					movement = contact.normal * speed;
+				} else {
+					movement += contact.normal * speed;
+				}
+  		}
 		}
 		movement.y = vertSpeed;
     movement *= Time.deltaTime;
