@@ -5,8 +5,9 @@ using Mirror;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : NetworkBehaviour {
-  private Transform target;
+  private Transform target; //for camera rotation
 
+  //vars for player movement
   public float speed = 6f;
   public float rotSpeed = 15.0f;
   public float gravity = -9.8f;
@@ -17,25 +18,25 @@ public class PlayerMovement : NetworkBehaviour {
 	public float pushForce = 3.0f;
 	private ControllerColliderHit contact;
 
-  private float turnSmoothVelocity;
-  public float turnSmoothTime = 3.0f;
+  private Animator animator; //animator
 
-  private Animator animator;
+  [SyncVar(hook = nameof(ChangeColor))] public Color random = Color.black; //sync var for random color changing (currently broken!)
 
-  [SyncVar(hook = nameof(ChangeColor))] public Color random = Color.black;
+  public CharacterController cc; //player's character controller
 
-  public CharacterController cc;
-
+  //on player created, assign random new color
   public override void OnStartServer() {
     base.OnStartServer();
     random = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
   }
 
   void Start() {
+    //client, only apply to local player
     if (!isLocalPlayer) {
       return;
     }
 
+    //assign vars
     vertSpeed = minFall;
 
     GameObject.FindGameObjectWithTag("Camera").GetComponent<FindPlayer>().SendMessage("Find", this.gameObject);
@@ -44,43 +45,40 @@ public class PlayerMovement : NetworkBehaviour {
     target = Camera.main.transform;
   }
 
+  //method to change player color
   void ChangeColor(Color col) {
       GetComponent<Renderer>().material.color = col;
   }
 
   void Update() {
+    //client, only apply to local player
     if (!isLocalPlayer) {
       return;
     }
 
-    // float deltaX = Input.GetAxisRaw("Horizontal")*speed;
-    // float deltaZ = Input.GetAxisRaw("Vertical")*speed;
-
+    //create vector3, assign horizontal and vertical player input
     Vector3 movement = Vector3.zero;
     float horInput = Input.GetAxis("Horizontal");
 		float vertInput = Input.GetAxis("Vertical");
+    //if the player is inputting a direction
 		if (horInput != 0 || vertInput != 0) {
+      //apply input to the movement
       movement.x = horInput * speed;
       movement.z = vertInput * speed;
       movement = Vector3.ClampMagnitude(movement, speed);
 
+      //determine which direction to head based on where camera is pointing
       Quaternion tmp = target.rotation;
       target.eulerAngles = new Vector3(0, target.eulerAngles.y, 0);
       movement = target.TransformDirection(movement);
       target.rotation = tmp;
 
+      //actually rotate player
       Quaternion direction = Quaternion.LookRotation(movement);
       transform.rotation = Quaternion.Lerp(transform.rotation, direction, rotSpeed * Time.deltaTime);
     }
 
-    // movement = Vector3.Cross(transform.forward, movement);
-    // movement = transform.TransformDirection(movement);
-
-    // Vector2 inputDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-    // inputDir = inputDir.normalized;
-    // float targetRot = Mathf.Atan2(inputDir.x, inputDir.y)*Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y;
-    // transform.eulerAngles = Vector3.up*Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRot, ref turnSmoothVelocity, turnSmoothTime);
-
+    //check if player is touching the ground
     bool hitGround = false;
     RaycastHit hit;
     if (vertSpeed < 0 && Physics.Raycast(transform.position, Vector3.down, out hit)) {
@@ -88,8 +86,9 @@ public class PlayerMovement : NetworkBehaviour {
       hitGround = hit.distance <= check;	// to be sure check slightly beyond bottom of capsule
     }
 
-    animator.SetFloat("Speed", movement.sqrMagnitude);
+    animator.SetFloat("Speed", movement.sqrMagnitude); //control speed float on the animator
 
+    //if touching the ground, the player can jump
     if (hitGround) {
 			if (Input.GetButtonDown("Jump")) {
 				vertSpeed = jumpSpeed;
@@ -97,7 +96,7 @@ public class PlayerMovement : NetworkBehaviour {
 				vertSpeed = minFall;
 				animator.SetBool("Jumping", false);
 			}
-		} else {
+		} else { //if player is not on the ground, fall
 			vertSpeed += gravity * 5 * Time.deltaTime;
 			if (vertSpeed < terminalVelocity) {
 				vertSpeed = terminalVelocity;
@@ -113,9 +112,10 @@ public class PlayerMovement : NetworkBehaviour {
 				}
   		}
 		}
-		movement.y = vertSpeed;
+		movement.y = vertSpeed; //assign vertical speed (positive if jumping, negative if falling) to y value of movement
     movement *= Time.deltaTime;
 
+    //move
     cc.Move(movement);
   }
 
