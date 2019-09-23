@@ -5,7 +5,10 @@ using Mirror;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : NetworkBehaviour {
+  private Transform target;
+
   public float speed = 6f;
+  public float rotSpeed = 15.0f;
   public float gravity = -9.8f;
 	public float jumpSpeed = 15.0f;
   private float vertSpeed;
@@ -37,6 +40,8 @@ public class PlayerMovement : NetworkBehaviour {
 
     GameObject.FindGameObjectWithTag("Camera").GetComponent<FindPlayer>().SendMessage("Find", this.gameObject);
     animator = GetComponent<Animator>();
+
+    target = Camera.main.transform;
   }
 
   void ChangeColor(Color col) {
@@ -48,15 +53,33 @@ public class PlayerMovement : NetworkBehaviour {
       return;
     }
 
-    float deltaX = Input.GetAxisRaw("Horizontal")*speed;
-    float deltaZ = Input.GetAxisRaw("Vertical")*speed;
-    Vector3 movement = new Vector3(deltaX, 0, deltaZ);
-    movement = Vector3.ClampMagnitude(movement, speed);
+    // float deltaX = Input.GetAxisRaw("Horizontal")*speed;
+    // float deltaZ = Input.GetAxisRaw("Vertical")*speed;
 
-    Vector2 inputDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-    inputDir = inputDir.normalized;
-    float targetRot = Mathf.Atan2(inputDir.x, inputDir.y)*Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y;
-    transform.eulerAngles = Vector3.up*Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRot, ref turnSmoothVelocity, turnSmoothTime);
+    Vector3 movement = Vector3.zero;
+    float horInput = Input.GetAxis("Horizontal");
+		float vertInput = Input.GetAxis("Vertical");
+		if (horInput != 0 || vertInput != 0) {
+      movement.x = horInput * speed;
+      movement.z = vertInput * speed;
+      movement = Vector3.ClampMagnitude(movement, speed);
+
+      Quaternion tmp = target.rotation;
+      target.eulerAngles = new Vector3(0, target.eulerAngles.y, 0);
+      movement = target.TransformDirection(movement);
+      target.rotation = tmp;
+
+      Quaternion direction = Quaternion.LookRotation(movement);
+      transform.rotation = Quaternion.Lerp(transform.rotation, direction, rotSpeed * Time.deltaTime);
+    }
+
+    // movement = Vector3.Cross(transform.forward, movement);
+    // movement = transform.TransformDirection(movement);
+
+    // Vector2 inputDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+    // inputDir = inputDir.normalized;
+    // float targetRot = Mathf.Atan2(inputDir.x, inputDir.y)*Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y;
+    // transform.eulerAngles = Vector3.up*Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRot, ref turnSmoothVelocity, turnSmoothTime);
 
     bool hitGround = false;
     RaycastHit hit;
