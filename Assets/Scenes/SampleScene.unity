@@ -1306,7 +1306,7 @@ MonoBehaviour:
   transport: {fileID: 2030416710}
   networkAddress: 10.11.132.141
   maxConnections: 4
-  playerPrefab: {fileID: 207225446811167169, guid: a3acb7fb6ce8c4fcba3cd6cf7a475e8f,
+  playerPrefab: {fileID: 4286008375857485991, guid: 22cca6c0743114f999a04d0a96584f78,
     type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
