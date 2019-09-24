@@ -30,13 +30,13 @@ public class PlayerMovement : NetworkBehaviour {
   public override void OnStartServer() {
     base.OnStartServer();
     cc.enabled = true;
-    animator = GetComponent<Animator>();
     random = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
   }
 
-  // public override void OnStartLocalPlayer() {
-  //   base.OnStartLocalPlayer();
-  // }
+  public override void OnStartLocalPlayer() {
+    base.OnStartLocalPlayer();
+    animator = GetComponent<Animator>();
+  }
 
   void Start() {
     //client, only apply to local player
