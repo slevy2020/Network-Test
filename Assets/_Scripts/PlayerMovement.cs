@@ -8,7 +8,9 @@ public class PlayerMovement : NetworkBehaviour {
   private Transform target; //for camera rotation
 
   //vars for player movement
-  public float speed = 6f;
+  public float speed;
+  public float walkSpeed = 3f;
+  public float runSpeed = 6f;
   public float rotSpeed = 15.0f;
   public float gravity = -9.8f;
 	public float jumpSpeed = 15.0f;
@@ -27,8 +29,14 @@ public class PlayerMovement : NetworkBehaviour {
   //on player created, assign random new color
   public override void OnStartServer() {
     base.OnStartServer();
+    cc.enabled = true;
+    animator = GetComponent<Animator>();
     random = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
   }
+
+  // public override void OnStartLocalPlayer() {
+  //   base.OnStartLocalPlayer();
+  // }
 
   void Start() {
     //client, only apply to local player
@@ -40,7 +48,6 @@ public class PlayerMovement : NetworkBehaviour {
     vertSpeed = minFall;
 
     GameObject.FindGameObjectWithTag("Camera").GetComponent<FindPlayer>().SendMessage("Find", this.gameObject);
-    animator = GetComponent<Animator>();
 
     target = Camera.main.transform;
   }
@@ -62,6 +69,15 @@ public class PlayerMovement : NetworkBehaviour {
 		float vertInput = Input.GetAxis("Vertical");
     //if the player is inputting a direction
 		if (horInput != 0 || vertInput != 0) {
+      //check if player is running
+      if (Input.GetKey(KeyCode.LeftShift)) {
+        speed = runSpeed;
+        animator.SetBool("Running", true);
+      } else {
+        speed = walkSpeed;
+        animator.SetBool("Running", false);
+      }
+
       //apply input to the movement
       movement.x = horInput * speed;
       movement.z = vertInput * speed;
