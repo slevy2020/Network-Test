@@ -98,7 +98,7 @@ public class PlayerMovement : NetworkBehaviour {
     bool hitGround = false;
     RaycastHit hit;
     if (vertSpeed < 0 && Physics.Raycast(transform.position, Vector3.down, out hit)) {
-      float check = (cc.height + cc.radius) / 1.9f;
+      float check = (cc.height + cc.radius) / 3f;
       hitGround = hit.distance <= check;	// to be sure check slightly beyond bottom of capsule
     }
 
